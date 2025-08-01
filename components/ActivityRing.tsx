@@ -69,15 +69,17 @@ const ActivityRing = ({
           fill="none"
         />
 
-        <Path
-          d="m2.828 15.555 7.777-7.779L2.828 0 0 2.828l4.949 4.948L0 12.727l2.828 2.828z"
-          fill={"#000"}
-          scale={0.8}
-          transform={`
+        {percentage !== 100 && (
+          <Path
+            d="m2.828 15.555 7.777-7.779L2.828 0 0 2.828l4.949 4.948L0 12.727l2.828 2.828z"
+            fill={"#000"}
+            scale={0.8}
+            transform={`
             translate(${arrowPosition.x + 13}, ${arrowPosition.y - 6})
             rotate(0, 0, 0)
           `}
-        />
+          />
+        )}
       </Svg>
     </View>
   );

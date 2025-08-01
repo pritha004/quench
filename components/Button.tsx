@@ -30,7 +30,7 @@ const CustomButton = ({
       disabled={isLoading}
     >
       {title && (
-        <Text className={`text-black font-bold text-lg ${textStyles}`}>
+        <Text className={twMerge(`text-black font-bold text-lg`, textStyles)}>
           {title}
         </Text>
       )}

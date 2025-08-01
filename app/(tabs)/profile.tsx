@@ -2,11 +2,12 @@ import CustomButton from "@/components/Button";
 import { useAuth } from "@/context/auth-context";
 import { logout } from "@/lib/appwrite";
 import { router } from "expo-router";
-import { Alert, Text } from "react-native";
+import { ChevronRight } from "lucide-react-native";
+import { Alert, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Profile = () => {
-  const { setUser } = useAuth();
+  const { user, setUser } = useAuth();
 
   const submit = async () => {
     try {
@@ -19,8 +20,55 @@ const Profile = () => {
   };
 
   return (
-    <SafeAreaView className="bg-bg flex-1">
-      <Text className="text-lg font-bold text-white">Profile</Text>
+    <SafeAreaView className="bg-bg flex-1 p-4">
+      <View className="flex-row  items-center gap-4 py-4">
+        <View className="h-20 w-20 bg-slate-50 rounded-full items-center justify-center">
+          <Text className="text-black text-3xl">
+            {user?.name
+              .split(" ")
+              .map((w) => w.charAt(0))
+              .join("")}
+          </Text>
+        </View>
+        <View>
+          <Text className="text-4xl text-textprimary font-extrabold font-raleway">
+            {user?.name}
+          </Text>
+          <Text className="text-lg text-textprimary font-semibold font-raleway lowercase">
+            {user?.email}
+          </Text>
+        </View>
+      </View>
+      <View className="flex-col gap-4 py-4">
+        <CustomButton
+          containerStyles="bg-surface items-start w-full"
+          textStyles="text-textprimary px-4"
+          handlePress={() => {}}
+          child={
+            <View className="flex-row w-full justify-between items-center px-4">
+              <Text className={`text-textprimary text-xl font-bold`}>
+                Health Details
+              </Text>
+
+              <ChevronRight color={"#E0E6E9"} />
+            </View>
+          }
+        />
+        <CustomButton
+          containerStyles="bg-surface items-start w-full"
+          textStyles="text-textprimary px-4"
+          handlePress={() => {}}
+          child={
+            <View className="flex-row w-full justify-between items-center px-4">
+              <Text className={`text-textprimary text-xl font-bold`}>
+                Change Hydration Goals
+              </Text>
+
+              <ChevronRight color={"#E0E6E9"} />
+            </View>
+          }
+        />
+      </View>
       <CustomButton
         title="Logout"
         handlePress={submit}

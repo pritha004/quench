@@ -27,14 +27,14 @@ const Home = () => {
           </Text>
         </View>
       </View>
-      <ScrollView className="my-2">
+      <ScrollView showsVerticalScrollIndicator={false} className="my-2">
         <View className="flex-col bg-surface rounded-lg my-2">
           <Text className="p-4 border-b-[1px] border-gray-600 text-xl font-bold text-textprimary">
             Activity Ring
           </Text>
           <View className="flex-row gap-8 items-center p-4">
             <View className="py-2">
-              <ActivityRings percentage={0} />
+              <ActivityRings percentage={80} />
             </View>
             <View>
               <Text className="text-lg font-semibold font-inter text-textprimary">
