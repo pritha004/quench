@@ -1,3 +1,3 @@
+import home from "./home";
 import images from "./images";
-
-export { images };
+export { home, images };

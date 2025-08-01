@@ -1,10 +1,11 @@
-import { Text, View } from "react-native";
+import { Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Analytics = () => {
   return (
-    <View>
-      <Text>Analytics</Text>
-    </View>
+    <SafeAreaView className="bg-bg flex-1">
+      <Text className="text-lg font-bold text-white">Analytics</Text>
+    </SafeAreaView>
   );
 };
 

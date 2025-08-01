@@ -6,19 +6,6 @@ const TabIcon = ({ focused, icon, title, color }: any) => {
   const Icon = icon;
   return (
     <>
-      {/* {focused ? (
-        <View className="flex w-full flex-1 min-w-[112px] min-h-16 mt-4 justify-center items-center rounded-full overflow-hidden">
-          <Icon color={color} />
-          <Text className="text-white text-base font-semibold ml-2">
-            {title}
-          </Text>
-        </View>
-      ) : (
-        <View className="size-full justify-center items-center mt-4 rounded-full">
-          <Icon color={color} />
-        </View>
-      )} */}
-
       <View className="size-full justify-center items-center mt-4 rounded-full">
         <Icon color={color} />
       </View>
@@ -38,7 +25,7 @@ export default function TabLayout() {
           alignItems: "center",
         },
         tabBarStyle: {
-          backgroundColor: "#021024",
+          backgroundColor: "#2b2b2b",
           borderRadius: 50,
           marginHorizontal: 20,
           marginBottom: 36,
@@ -48,8 +35,8 @@ export default function TabLayout() {
           borderWidth: 1,
           borderColor: "#021024",
         },
-        tabBarActiveTintColor: "#ffffff",
-        tabBarInactiveTintColor: "#5483B3",
+        tabBarActiveTintColor: "#82D4C9",
+        tabBarInactiveTintColor: "#ffffff",
       }}
     >
       <Tabs.Screen

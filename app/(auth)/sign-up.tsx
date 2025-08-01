@@ -55,7 +55,7 @@ const SignUp = () => {
             Build a better hydration habit.
           </Text>
           <FormField
-            title="Username"
+            title="Name"
             value={form.username}
             handleChangeText={(e: any) => setForm({ ...form, username: e })}
             otherStyles="mt-8"
@@ -74,7 +74,7 @@ const SignUp = () => {
             otherStyles="mt-6"
           />
           <CustomButton
-            title="Sign In"
+            title="Sign Up"
             handlePress={submit}
             containerStyles="mt-7"
             isLoading={isSubmitting}

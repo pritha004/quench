@@ -1,5 +1,6 @@
 import React from "react";
 import { Text, TouchableOpacity } from "react-native";
+import { twMerge } from "tailwind-merge";
 
 type Props = {
   title?: string;
@@ -20,7 +21,10 @@ const CustomButton = ({
 }: Props) => {
   return (
     <TouchableOpacity
-      className={`${child ? "" : "bg-accent w-full"} rounded-xl min-h-[62px] justify-center items-center ${containerStyles} ${isLoading ? "opacity-50" : ""}`}
+      className={twMerge(
+        `${child ? "" : "bg-accent w-full"} rounded-xl min-h-[62px] justify-center items-center ${isLoading ? "opacity-50" : ""}`,
+        containerStyles
+      )}
       onPress={handlePress}
       activeOpacity={0.7}
       disabled={isLoading}
