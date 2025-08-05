@@ -1,13 +1,16 @@
 import CustomButton from "@/components/Button";
+import Drawer from "@/components/Drawer";
 import { useAuth } from "@/context/auth-context";
 import { logout } from "@/lib/appwrite";
 import { router } from "expo-router";
 import { ChevronRight } from "lucide-react-native";
+import React, { useState } from "react";
 import { Alert, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Profile = () => {
   const { user, setUser } = useAuth();
+  const [drawerVisible, setDrawerVisible] = useState(false);
 
   const submit = async () => {
     try {
@@ -43,7 +46,9 @@ const Profile = () => {
         <CustomButton
           containerStyles="bg-surface items-start w-full"
           textStyles="text-textprimary px-4"
-          handlePress={() => {}}
+          handlePress={() => {
+            setDrawerVisible(true);
+          }}
           child={
             <View className="flex-row w-full justify-between items-center px-4">
               <Text className={`text-textprimary text-xl font-bold`}>
@@ -74,6 +79,7 @@ const Profile = () => {
         handlePress={submit}
         containerStyles="mt-7"
       />
+      <Drawer visible={drawerVisible} onClose={() => setDrawerVisible(false)} />
     </SafeAreaView>
   );
 };
