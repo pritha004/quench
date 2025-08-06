@@ -1,3 +1,4 @@
 import home from "./home";
 import images from "./images";
-export { home, images };
+import profile from "./profile";
+export { home, images, profile };

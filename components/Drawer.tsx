@@ -4,7 +4,6 @@ import {
   Animated,
   Dimensions,
   Modal,
-  Text,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
@@ -16,9 +15,14 @@ const { width, height } = Dimensions.get("window");
 type DrawerProps = {
   visible: boolean;
   onClose: () => void;
+  drawerContent: React.ReactNode;
 };
 
-export default function Drawer({ visible, onClose }: DrawerProps) {
+export default function Drawer({
+  visible,
+  onClose,
+  drawerContent,
+}: DrawerProps) {
   const slideAnim = useRef(new Animated.Value(width)).current;
   const navigation = useNavigation();
 
@@ -79,14 +83,7 @@ export default function Drawer({ visible, onClose }: DrawerProps) {
             handlePress={() => navigateToScreen("profile")}
             title="Done"
           />
-          <View className="">
-            <Text className="my-2 text-textprimary text-3xl font-bold text-center">
-              Personalise Quench
-            </Text>
-            <Text className="text-textsecondary text-lg text-center">
-              This information ensures Quench data are as accurate as possible.
-            </Text>
-          </View>
+          <View>{drawerContent}</View>
         </Animated.View>
       </GestureDetector>
     </Modal>
