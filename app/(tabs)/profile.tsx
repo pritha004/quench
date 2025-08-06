@@ -5,7 +5,7 @@ import Dropdown from "@/components/Dropdown";
 import { profile } from "@/constants";
 import { useAuth } from "@/context/auth-context";
 import { logout } from "@/lib/appwrite";
-import { router } from "expo-router";
+import { router, useNavigation } from "expo-router";
 import { ChevronRight } from "lucide-react-native";
 import React, { useState } from "react";
 import { Alert, Text, View } from "react-native";
@@ -15,6 +15,7 @@ type MenuType = (typeof profile.menus)[number]["id"];
 
 const Profile = () => {
   const { user, setUser } = useAuth();
+  const navigation = useNavigation();
   const [drawerVisible, setDrawerVisible] = useState<{
     id: MenuType | null;
     visible: boolean;
@@ -100,49 +101,65 @@ const Profile = () => {
         drawerContent={
           drawerVisible.id === "health_details" ? (
             <>
-              <Text className="my-2 text-textprimary text-3xl font-bold text-center">
-                Personalise Quench
-              </Text>
-              <Text className="text-textsecondary text-lg text-center">
-                This information ensures Quench data are as accurate as
-                possible.
-              </Text>
-              <View className="my-4">
-                <DatePicker
-                  title="Date of Birth"
-                  value={dob}
-                  onChange={setDob}
-                />
-                <Dropdown
-                  value={gender}
-                  onChange={setGender}
-                  options={[
-                    { label: "Male", value: "male" },
-                    { label: "Female", value: "female" },
-                    { label: "Other", value: "other" },
-                  ]}
-                  title="Gender"
-                />
-                <Dropdown
-                  value={weight}
-                  onChange={setWeight}
-                  options={Array.from({ length: 300 }, (_, i) => ({
-                    label: `${i.toString()} kg`,
-                    value: i,
-                  }))}
-                  title="Weight"
-                />
-                <Dropdown
-                  value={height}
-                  onChange={setHeight}
-                  options={Array.from({ length: 300 }, (_, i) => {
-                    const num = i + 30;
-                    return {
-                      label: `${num.toString()} cm`,
-                      value: num,
-                    };
-                  })}
-                  title="Height"
+              <View>
+                <Text className="my-4 text-textprimary text-3xl font-bold text-center">
+                  Personalise Quench
+                </Text>
+                <Text className="my-2 text-textsecondary text-lg text-center">
+                  This information ensures Quench data are as accurate as
+                  possible.
+                </Text>
+                <View className="my-4">
+                  <DatePicker
+                    title="Date of Birth"
+                    value={dob}
+                    onChange={setDob}
+                  />
+                  <Dropdown
+                    value={gender}
+                    onChange={setGender}
+                    options={[
+                      { label: "Male", value: "male" },
+                      { label: "Female", value: "female" },
+                      { label: "Other", value: "other" },
+                    ]}
+                    title="Gender"
+                  />
+                  <Dropdown
+                    value={weight}
+                    onChange={setWeight}
+                    options={Array.from({ length: 300 }, (_, i) => ({
+                      label: `${i.toString()} kg`,
+                      value: i,
+                    }))}
+                    title="Weight"
+                  />
+                  <Dropdown
+                    value={height}
+                    onChange={setHeight}
+                    options={Array.from({ length: 300 }, (_, i) => {
+                      const num = i + 30;
+                      return {
+                        label: `${num.toString()} cm`,
+                        value: num,
+                      };
+                    })}
+                    title="Height"
+                  />
+                </View>
+              </View>
+              <View>
+                <CustomButton
+                  handlePress={() => {
+                    setDrawerVisible({
+                      id: null,
+                      visible: false,
+                    });
+                    setTimeout(() => {
+                      navigation.navigate("profile" as never);
+                    }, 300);
+                  }}
+                  title="Done"
                 />
               </View>
             </>

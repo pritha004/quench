@@ -1,4 +1,3 @@
-import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useRef } from "react";
 import {
   Animated,
@@ -8,7 +7,6 @@ import {
   View,
 } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import CustomButton from "./Button";
 
 const { width, height } = Dimensions.get("window");
 
@@ -24,7 +22,6 @@ export default function Drawer({
   drawerContent,
 }: DrawerProps) {
   const slideAnim = useRef(new Animated.Value(width)).current;
-  const navigation = useNavigation();
 
   useEffect(() => {
     if (visible) {
@@ -41,13 +38,6 @@ export default function Drawer({
       }).start();
     }
   }, [visible]);
-
-  const navigateToScreen = (screen: string) => {
-    onClose();
-    setTimeout(() => {
-      navigation.navigate(screen as never);
-    }, 300);
-  };
 
   const swipeDown = Gesture.Pan()
     .onUpdate((e) => {
@@ -77,12 +67,6 @@ export default function Drawer({
           }}
           className="bg-bg rounded-tl-2xl rounded-tr-2xl p-5 shadow-lg"
         >
-          <CustomButton
-            containerStyles="items-end justify-between w-full bg-transparent"
-            textStyles="text-textprimary text-accent font-bold text-xl"
-            handlePress={() => navigateToScreen("profile")}
-            title="Done"
-          />
           <View>{drawerContent}</View>
         </Animated.View>
       </GestureDetector>
