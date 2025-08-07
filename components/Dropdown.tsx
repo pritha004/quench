@@ -30,7 +30,7 @@ const Dropdown = <T extends string | number>({
   const [showPicker, setShowPicker] = useState(false);
 
   const selectedLabel =
-    options.find((item) => item.value === value)?.label || "Choose";
+    options.find((item) => item.value === value)?.label || "Select";
 
   const renderOption = ({ item }: { item: Option<T> }) => (
     <TouchableOpacity
@@ -90,7 +90,7 @@ const Dropdown = <T extends string | number>({
             <View className="bg-surface text-textprimary rounded-t-xl px-4 py-8">
               <View className="flex-row justify-start mb-2">
                 <TouchableOpacity onPress={cancelSelection}>
-                  <Text className="text-accent font-medium">Cancel</Text>
+                  <Text className="text-accent font-semibold">Cancel</Text>
                 </TouchableOpacity>
               </View>
               <View className="items-center">

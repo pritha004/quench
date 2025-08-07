@@ -11,7 +11,6 @@ module.exports = {
         "accent": "#82D4C9",
         "textprimary": "#E0E6E9",
         "textsecondary": "#A3B1B9",
-        "cta": "#3AAFA9",
       },
       fontFamily: {
         "inter": ["Inter"],

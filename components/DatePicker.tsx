@@ -5,13 +5,13 @@ import CustomButton from "./Button";
 
 type DatePickerProps = {
   title: string;
-  value: Date;
-  onChange: (date: Date) => void;
+  value: Date | null;
+  onChange: (date: Date | null) => void;
 };
 
 const DatePicker = ({ title, value, onChange }: DatePickerProps) => {
   const [showPicker, setShowPicker] = useState(false);
-  const [tempDate, setTempDate] = useState<Date>(value);
+  const [tempDate, setTempDate] = useState<Date | null>(value);
 
   const handleTempChange = (_event: any, selectedDate?: Date) => {
     if (selectedDate) {
@@ -29,7 +29,7 @@ const DatePicker = ({ title, value, onChange }: DatePickerProps) => {
     setShowPicker(false);
   };
 
-  const formattedDate = value.toLocaleDateString();
+  const formattedDate = value ? value.toLocaleDateString() : "Select";
 
   return (
     <View className="mb-4">
@@ -60,15 +60,15 @@ const DatePicker = ({ title, value, onChange }: DatePickerProps) => {
             <View className="bg-surface text-textprimary rounded-t-xl px-4 py-8">
               <View className="flex-row justify-between mb-2">
                 <TouchableOpacity onPress={cancelPicker}>
-                  <Text className="text-accent font-medium">Cancel</Text>
+                  <Text className="text-accent font-semibold">Cancel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={confirmDate}>
-                  <Text className="text-accent font-medium">Done</Text>
+                  <Text className="text-accent font-semibold">Done</Text>
                 </TouchableOpacity>
               </View>
               <View className="items-center">
                 <DateTimePicker
-                  value={tempDate}
+                  value={tempDate || new Date()}
                   mode="date"
                   display="spinner"
                   onChange={handleTempChange}
@@ -84,7 +84,7 @@ const DatePicker = ({ title, value, onChange }: DatePickerProps) => {
 
       {Platform.OS === "android" && showPicker && (
         <DateTimePicker
-          value={value}
+          value={value || new Date()}
           mode="date"
           display="default"
           onChange={(_event, selectedDate) => {

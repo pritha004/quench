@@ -30,7 +30,7 @@ const Index = () => {
             </Text>
             <CustomButton
               child={
-                <View className="bg-cta rounded-full mt-10 p-4 animate-bounce">
+                <View className="bg-accent rounded-full mt-10 p-4 animate-bounce">
                   <ArrowRight color={"black"} />
                 </View>
               }

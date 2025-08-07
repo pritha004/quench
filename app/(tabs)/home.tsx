@@ -40,7 +40,7 @@ const Home = () => {
               <Text className="text-lg font-semibold font-inter text-textprimary">
                 Hydration
               </Text>
-              <Text className="text-2xl font-raleway font-bold text-cta">
+              <Text className="text-2xl font-raleway font-bold text-accent">
                 100/2000 ml
               </Text>
             </View>

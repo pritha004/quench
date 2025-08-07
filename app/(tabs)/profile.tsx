@@ -6,12 +6,20 @@ import { profile } from "@/constants";
 import { useAuth } from "@/context/auth-context";
 import { logout } from "@/lib/appwrite";
 import { router, useNavigation } from "expo-router";
-import { ChevronRight } from "lucide-react-native";
+import { ChevronRight, MinusIcon, PlusIcon } from "lucide-react-native";
 import React, { useState } from "react";
 import { Alert, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type MenuType = (typeof profile.menus)[number]["id"];
+
+type HealthDetailsFormData = {
+  dob: Date | null;
+  gender: string;
+  weight_kg: number | null;
+  height_cm: number | null;
+  daily_goal_ml: number;
+};
 
 const Profile = () => {
   const { user, setUser } = useAuth();
@@ -24,7 +32,7 @@ const Profile = () => {
     visible: false,
   });
 
-  const submit = async () => {
+  const logoutHandler = async () => {
     try {
       const result: any = await logout();
       setUser(null);
@@ -34,13 +42,14 @@ const Profile = () => {
     }
   };
 
-  const [dob, setDob] = useState<Date>(new Date(2000, 0, 1));
-
-  const [gender, setGender] = useState<string>("");
-
-  const [weight, setWeight] = useState<number>(0);
-
-  const [height, setHeight] = useState<number>(100);
+  const [healthDetailsFormData, setHealthDetailsFormData] =
+    useState<HealthDetailsFormData>({
+      dob: null,
+      gender: "",
+      weight_kg: null,
+      height_cm: null,
+      daily_goal_ml: 2500,
+    });
 
   return (
     <SafeAreaView className="bg-bg flex-1 p-4">
@@ -87,7 +96,7 @@ const Profile = () => {
       </View>
       <CustomButton
         title="Logout"
-        handlePress={submit}
+        handlePress={logoutHandler}
         containerStyles="mt-7"
       />
       <Drawer
@@ -112,31 +121,45 @@ const Profile = () => {
                 <View className="my-4">
                   <DatePicker
                     title="Date of Birth"
-                    value={dob}
-                    onChange={setDob}
+                    value={healthDetailsFormData.dob}
+                    onChange={(date) =>
+                      setHealthDetailsFormData((prev) => ({
+                        ...prev,
+                        dob: date,
+                      }))
+                    }
                   />
                   <Dropdown
-                    value={gender}
-                    onChange={setGender}
+                    value={healthDetailsFormData.gender}
                     options={[
                       { label: "Male", value: "male" },
                       { label: "Female", value: "female" },
                       { label: "Other", value: "other" },
                     ]}
                     title="Gender"
+                    onChange={(value) =>
+                      setHealthDetailsFormData((prev) => ({
+                        ...prev,
+                        gender: value,
+                      }))
+                    }
                   />
                   <Dropdown
-                    value={weight}
-                    onChange={setWeight}
+                    value={healthDetailsFormData.weight_kg}
                     options={Array.from({ length: 300 }, (_, i) => ({
                       label: `${i.toString()} kg`,
                       value: i,
                     }))}
                     title="Weight"
+                    onChange={(value) =>
+                      setHealthDetailsFormData((prev) => ({
+                        ...prev,
+                        weight: value,
+                      }))
+                    }
                   />
                   <Dropdown
-                    value={height}
-                    onChange={setHeight}
+                    value={healthDetailsFormData.height_cm}
                     options={Array.from({ length: 300 }, (_, i) => {
                       const num = i + 30;
                       return {
@@ -145,6 +168,12 @@ const Profile = () => {
                       };
                     })}
                     title="Height"
+                    onChange={(value) =>
+                      setHealthDetailsFormData((prev) => ({
+                        ...prev,
+                        height: value,
+                      }))
+                    }
                   />
                 </View>
               </View>
@@ -164,7 +193,72 @@ const Profile = () => {
               </View>
             </>
           ) : (
-            <></>
+            <>
+              <View>
+                <Text className="my-4 text-textprimary text-3xl font-bold text-center">
+                  Daily Hydration Goal
+                </Text>
+                <Text className="my-2 text-textsecondary text-lg text-center">
+                  Set a daily hydration target that works for you.
+                </Text>
+                <View className="my-32">
+                  <View className=" flex-row justify-center items-center gap-8">
+                    <CustomButton
+                      child={
+                        <View className="bg-accent rounded-full p-4">
+                          <MinusIcon color={"black"} size={32} />
+                        </View>
+                      }
+                      handlePress={() =>
+                        setHealthDetailsFormData((prev) => ({
+                          ...prev,
+                          daily_goal_ml:
+                            healthDetailsFormData.daily_goal_ml - 100,
+                        }))
+                      }
+                      containerStyles=""
+                    />
+                    <Text className="text-textprimary font-bold text-5xl">
+                      {healthDetailsFormData.daily_goal_ml}
+                    </Text>
+                    <CustomButton
+                      child={
+                        <View className="bg-accent rounded-full p-4">
+                          <PlusIcon color={"black"} size={32} />
+                        </View>
+                      }
+                      handlePress={() =>
+                        setHealthDetailsFormData((prev) => ({
+                          ...prev,
+                          daily_goal_ml:
+                            healthDetailsFormData.daily_goal_ml + 100,
+                        }))
+                      }
+                      containerStyles=""
+                    />
+                  </View>
+                  <View className="flex-row justify-center my-4">
+                    <Text className="text-textprimary uppercase font-bold text-2xl">
+                      millilitres/day
+                    </Text>
+                  </View>
+                </View>
+              </View>
+              <View>
+                <CustomButton
+                  handlePress={() => {
+                    setDrawerVisible({
+                      id: null,
+                      visible: false,
+                    });
+                    setTimeout(() => {
+                      navigation.navigate("profile" as never);
+                    }, 300);
+                  }}
+                  title="Change Hydration Goal"
+                />
+              </View>
+            </>
           )
         }
       />
