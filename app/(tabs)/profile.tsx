@@ -3,8 +3,9 @@ import DatePicker from "@/components/DatePicker";
 import Drawer from "@/components/Drawer";
 import Dropdown from "@/components/Dropdown";
 import { profile } from "@/constants";
-import { useAuth } from "@/context/auth-context";
-import { logout } from "@/lib/appwrite";
+import { UserPreferences, useAuth } from "@/context/auth-context";
+import useFetch from "@/hooks/use-fetch";
+import { logout, updateUserDetails } from "@/lib/appwrite";
 import { router, useNavigation } from "expo-router";
 import { ChevronRight, MinusIcon, PlusIcon } from "lucide-react-native";
 import React, { useState } from "react";
@@ -15,7 +16,7 @@ type MenuType = (typeof profile.menus)[number]["id"];
 
 type HealthDetailsFormData = {
   dob: Date | null;
-  gender: string;
+  gender: string | null;
   weight_kg: number | null;
   height_cm: number | null;
   daily_goal_ml: number;
@@ -42,14 +43,35 @@ const Profile = () => {
     }
   };
 
+  const {
+    loading: updateUserLoading,
+    fn: updateUserFn,
+    data: userData,
+  } = useFetch(updateUserDetails);
+
   const [healthDetailsFormData, setHealthDetailsFormData] =
     useState<HealthDetailsFormData>({
-      dob: null,
-      gender: "",
-      weight_kg: null,
-      height_cm: null,
-      daily_goal_ml: 2500,
+      dob: user?.dob ? new Date(user?.dob) : null,
+      gender: user?.gender || null,
+      weight_kg: user?.weight_kg || null,
+      height_cm: user?.height_cm || null,
+      daily_goal_ml: user?.daily_goal_ml || 2500,
     });
+
+  const onSubmitHealthDetails = async (values: any) => {
+    try {
+      await updateUserFn(user, {
+        ...values,
+      });
+
+      setUser((prev: UserPreferences | null): UserPreferences | null => {
+        if (!prev) return null;
+        return { ...prev, ...userData };
+      });
+    } catch (error) {
+      console.error("Profile completion error:", error);
+    }
+  };
 
   return (
     <SafeAreaView className="bg-bg flex-1 p-4">
@@ -154,7 +176,7 @@ const Profile = () => {
                     onChange={(value) =>
                       setHealthDetailsFormData((prev) => ({
                         ...prev,
-                        weight: value,
+                        weight_kg: value,
                       }))
                     }
                   />
@@ -171,7 +193,7 @@ const Profile = () => {
                     onChange={(value) =>
                       setHealthDetailsFormData((prev) => ({
                         ...prev,
-                        height: value,
+                        height_cm: value,
                       }))
                     }
                   />
@@ -180,6 +202,7 @@ const Profile = () => {
               <View>
                 <CustomButton
                   handlePress={() => {
+                    onSubmitHealthDetails(healthDetailsFormData);
                     setDrawerVisible({
                       id: null,
                       visible: false,

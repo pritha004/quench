@@ -30,11 +30,9 @@ export const signup = async (email: string, password: string, name: string) => {
         name,
       }
     );
-
-    return newUser;
   } catch (error: any) {
-    console.log(error);
-    throw new Error(error);
+    console.log("Signup error", error);
+    throw new Error(error.message || "Signup failed");
   }
 };
 
@@ -52,7 +50,7 @@ export const signin = async (email: string, password: string) => {
 export const getCurrentUser = async () => {
   try {
     const currentAccount = await account.get();
-    if (!currentAccount) throw Error;
+    if (!currentAccount) throw new Error("No current account");
 
     const currentUser = await db.listDocuments(
       DATABASE_ID,
@@ -60,11 +58,23 @@ export const getCurrentUser = async () => {
       [Query.equal("userId", currentAccount.$id)]
     );
 
-    if (!currentUser) throw Error;
+    if (!currentUser || currentUser.documents.length === 0) {
+      throw new Error("User document not found");
+    }
+    const {
+      $id,
+      $collectionId,
+      $databaseId,
+      $createdAt,
+      $updatedAt,
+      $permissions,
+      $sequence,
+      ...customFields
+    } = currentUser.documents[0];
 
-    return currentUser.documents[0];
+    return { ...customFields, $id };
   } catch (error) {
-    console.log(error);
+    console.log("Current user error", error);
   }
 };
 
@@ -73,5 +83,34 @@ export const logout = async () => {
     await account.deleteSession("current");
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const updateUserDetails = async (user: any, data: any) => {
+  try {
+    const { $id, ...safeFields } = user;
+    const updatedUser = await db.updateDocument(
+      DATABASE_ID,
+      USER_COLLECTION_ID,
+      user.$id,
+      {
+        ...safeFields,
+        ...data,
+      }
+    );
+
+    const {
+      $collectionId,
+      $databaseId,
+      $createdAt,
+      $updatedAt,
+      $permissions,
+      $sequence,
+      ...customFields
+    } = updatedUser;
+
+    return customFields;
+  } catch (error) {
+    console.log("Update user error", error);
   }
 };

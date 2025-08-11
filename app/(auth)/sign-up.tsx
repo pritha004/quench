@@ -2,7 +2,7 @@ import CustomButton from "@/components/Button";
 import FormField from "@/components/FormField";
 import { images } from "@/constants";
 import { useAuth } from "@/context/auth-context";
-import { signup } from "@/lib/appwrite";
+import { getCurrentUser, signup } from "@/lib/appwrite";
 import { Link, router } from "expo-router";
 import React, { useState } from "react";
 import { Alert, Image, ScrollView, Text, View } from "react-native";
@@ -26,12 +26,10 @@ const SignUp = () => {
 
     setIsSubmitting(true);
     try {
-      const result: any = await signup(
-        form.email,
-        form.password,
-        form.username
-      );
-      setUser(result);
+      await signup(form.email, form.password, form.username);
+      const currentUser: any = await getCurrentUser();
+
+      setUser(currentUser);
       router.replace("/home");
     } catch (error: any) {
       Alert.alert("Error", error?.message);
