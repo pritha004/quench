@@ -11,6 +11,8 @@ export const db = new Databases(client);
 export const DATABASE_ID = process.env.EXPO_PUBLIC_DB_ID || "";
 export const USER_COLLECTION_ID =
   process.env.EXPO_PUBLIC_USER_COLLECTION_ID || "";
+export const HYDRATIONLOGS_COLLECTION_ID =
+  process.env.EXPO_PUBLIC_HYDRATIONLOGS_COLLECTION_ID || "";
 
 export const signup = async (email: string, password: string, name: string) => {
   try {
@@ -112,5 +114,61 @@ export const updateUserDetails = async (user: any, data: any) => {
     return customFields;
   } catch (error) {
     console.log("Update user error", error);
+  }
+};
+
+export const logHydration = async (data: any) => {
+  try {
+    const newLog = await db.createDocument(
+      DATABASE_ID,
+      HYDRATIONLOGS_COLLECTION_ID,
+      ID.unique(),
+      {
+        userId: data.userId,
+        amt_intake_ml: data.amtIntake,
+        logged_at: data.loggedAt,
+      }
+    );
+  } catch (error) {
+    console.log("Hydration log error", error);
+  }
+};
+
+export const getUserHydration = async (userId: string) => {
+  try {
+    const today = new Date();
+    const startOfToday = new Date(today.setHours(0, 0, 0, 0)).toISOString();
+    const startOfTomorrow = new Date(today.setDate(today.getDate() + 1));
+    startOfTomorrow.setHours(0, 0, 0, 0);
+    const endOfToday = startOfTomorrow.toISOString();
+
+    const dailyIntake = await db.listDocuments(
+      DATABASE_ID,
+      HYDRATIONLOGS_COLLECTION_ID,
+      [
+        Query.equal("userId", userId),
+        Query.greaterThanEqual("logged_at", startOfToday),
+        Query.lessThan("logged_at", endOfToday),
+      ]
+    );
+
+    const list = dailyIntake.documents.map((doc) => {
+      const {
+        $id,
+        $collectionId,
+        $databaseId,
+        $createdAt,
+        $updatedAt,
+        $permissions,
+        $sequence,
+        ...customFields
+      } = doc;
+
+      return customFields;
+    });
+
+    return list;
+  } catch (error) {
+    console.log("Fetch Hydration logs error", error);
   }
 };

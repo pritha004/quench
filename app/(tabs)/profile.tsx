@@ -43,11 +43,7 @@ const Profile = () => {
     }
   };
 
-  const {
-    loading: updateUserLoading,
-    fn: updateUserFn,
-    data: userData,
-  } = useFetch(updateUserDetails);
+  const { fn: updateUserFn, data: userData } = useFetch(updateUserDetails);
 
   const [healthDetailsFormData, setHealthDetailsFormData] =
     useState<HealthDetailsFormData>({
@@ -270,6 +266,7 @@ const Profile = () => {
               <View>
                 <CustomButton
                   handlePress={() => {
+                    onSubmitHealthDetails(healthDetailsFormData);
                     setDrawerVisible({
                       id: null,
                       visible: false,
