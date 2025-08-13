@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     getUser();
-  }, []);
+  }, [user, setUser]);
 
   const getUser = async () => {
     try {

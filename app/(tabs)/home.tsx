@@ -26,7 +26,7 @@ const Home = () => {
         userHydrationLogs?.reduce((sum, obj) => sum + obj.amt_intake_ml, 0) || 0
       );
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     setTotalIntake(
