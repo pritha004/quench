@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   FlatList,
+  InteractionManager,
   Modal,
   Platform,
   Text,
@@ -45,18 +46,27 @@ const Dropdown = <T extends string | number>({
   );
 
   const cancelSelection = () => {
+    didScrollToIndex.current = false;
     setShowPicker(false);
   };
 
   const listRef = useRef<FlatList>(null);
+  const didScrollToIndex = useRef(false);
 
   useEffect(() => {
     if (showPicker) {
+      didScrollToIndex.current = false;
+    }
+  }, [showPicker]);
+
+  useEffect(() => {
+    if (showPicker && !didScrollToIndex.current) {
       const index = options.findIndex((item) => item.value === value);
       if (index >= 0 && listRef.current) {
-        setTimeout(() => {
+        InteractionManager.runAfterInteractions(() => {
           listRef.current?.scrollToIndex({ index, animated: true });
-        }, 100);
+          didScrollToIndex.current = true;
+        });
       }
     }
   }, [showPicker, value, options]);
@@ -100,6 +110,7 @@ const Dropdown = <T extends string | number>({
                   data={options}
                   keyExtractor={(item) => item.value.toString()}
                   renderItem={renderOption}
+                  initialNumToRender={options.length}
                   style={{ maxHeight: 250 }}
                   getItemLayout={(_, index) => ({
                     length: 50,
