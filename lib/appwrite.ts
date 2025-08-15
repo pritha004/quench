@@ -138,21 +138,44 @@ export const getUserHydration = async (userId: string) => {
   try {
     const today = new Date();
     const startOfToday = new Date(today.setHours(0, 0, 0, 0)).toISOString();
-    const startOfTomorrow = new Date(today.setDate(today.getDate() + 1));
+
+    const startOfTomorrow = new Date(today);
+    startOfTomorrow.setDate(today.getDate() + 1);
     startOfTomorrow.setHours(0, 0, 0, 0);
     const endOfToday = startOfTomorrow.toISOString();
 
-    const dailyIntake = await db.listDocuments(
-      DATABASE_ID,
-      HYDRATIONLOGS_COLLECTION_ID,
-      [
+    const allLogs: any[] = [];
+    let lastId: string | null = null;
+    let hasMore = true;
+
+    while (hasMore) {
+      const queries = [
         Query.equal("userId", userId),
         Query.greaterThanEqual("logged_at", startOfToday),
         Query.lessThan("logged_at", endOfToday),
-      ]
-    );
+        Query.limit(100),
+      ];
 
-    const list = dailyIntake.documents.map((doc) => {
+      if (lastId) {
+        queries.push(Query.cursorAfter(lastId));
+      }
+
+      const res = await db.listDocuments(
+        DATABASE_ID,
+        HYDRATIONLOGS_COLLECTION_ID,
+        queries
+      );
+
+      allLogs.push(...res.documents);
+
+      if (res.documents.length < 100) {
+        hasMore = false;
+      } else {
+        lastId = res.documents[res.documents.length - 1].$id;
+      }
+    }
+
+    const strippedLogs = allLogs.map((doc) => {
       const {
         $id,
         $collectionId,
@@ -167,8 +190,9 @@ export const getUserHydration = async (userId: string) => {
       return customFields;
     });
 
-    return list;
+    return strippedLogs;
   } catch (error) {
     console.log("Fetch Hydration logs error", error);
+    return [];
   }
 };

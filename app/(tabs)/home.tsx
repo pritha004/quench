@@ -92,40 +92,40 @@ const Home = () => {
             </View>
           </View>
         </View>
-        {user?.daily_goal_ml && totalIntake < user?.daily_goal_ml && (
-          <View className="flex-col bg-surface rounded-lg my-2">
-            <Text className="p-4 border-b-[1px] border-gray-600 text-xl font-bold text-textprimary">
-              Another Gulp?
-            </Text>
-            <View className="flex-row flex-wrap gap-8 justify-start items-center p-4">
-              {home.waterConsumedAmt.map(
-                (op: { label: string; value: number }) => (
-                  <CustomButton
-                    key={op.value}
-                    title={op.label}
-                    containerStyles="min-h-[40px] bg-transparent border-accent border-2 rounded-full w-1/4"
-                    textStyles="text-textprimary"
-                    handlePress={() => {
-                      onSubmitAddHydration({
-                        userId: user?.userId,
-                        amtIntake: op.value,
-                        loggedAt: new Date(),
-                      });
-                    }}
-                  />
-                )
-              )}
-              <CustomButton
-                handlePress={() => setOpenCustomAdd(true)}
-                child={
-                  <View className="bg-accent rounded-full p-3">
-                    <Plus color={"black"} />
-                  </View>
-                }
-              />
-            </View>
+
+        <View className="flex-col bg-surface rounded-lg my-2">
+          <Text className="p-4 border-b-[1px] border-gray-600 text-xl font-bold text-textprimary">
+            Another Gulp?
+          </Text>
+          <View className="flex-row flex-wrap gap-8 justify-start items-center p-4">
+            {home.waterConsumedAmt.map(
+              (op: { label: string; value: number }) => (
+                <CustomButton
+                  key={op.value}
+                  title={op.label}
+                  containerStyles="min-h-[40px] bg-transparent border-accent border-2 rounded-full w-1/4"
+                  textStyles="text-textprimary"
+                  handlePress={() => {
+                    onSubmitAddHydration({
+                      userId: user?.userId,
+                      amtIntake: op.value,
+                      loggedAt: new Date(),
+                    });
+                  }}
+                />
+              )
+            )}
+            <CustomButton
+              handlePress={() => setOpenCustomAdd(true)}
+              child={
+                <View className="bg-accent rounded-full p-3">
+                  <Plus color={"black"} />
+                </View>
+              }
+            />
           </View>
-        )}
+        </View>
+
         {userHydrationLogs && userHydrationLogs.length > 0 && (
           <View className="flex-col bg-surface rounded-lg mt-2 mb-12">
             <Text className="p-4 border-b-[1px] border-gray-600 text-xl font-bold text-textprimary">

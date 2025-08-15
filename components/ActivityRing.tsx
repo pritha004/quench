@@ -8,6 +8,7 @@ type Props = {
   strokeWidth?: number;
   color?: string;
   backgroundColor?: string;
+  overflowColor?: string;
 };
 
 const ActivityRing = ({
@@ -16,6 +17,7 @@ const ActivityRing = ({
   strokeWidth = 28,
   color = "#3AAFA9",
   backgroundColor = "#b2d3d6",
+  overflowColor = "#68d6d0",
 }: Props) => {
   const polarToCartesian = (
     cx: number,
@@ -31,20 +33,27 @@ const ActivityRing = ({
   };
 
   const minArc = 0.01;
-  const visualPercentage = percentage <= 0 ? minArc : percentage;
+  const clampedPercentage = Math.min(percentage, 100);
+  const visualPercentage = clampedPercentage <= 0 ? minArc : clampedPercentage;
 
   const circumference = 2 * Math.PI * radius;
   const dashOffset = circumference * (1 - visualPercentage / 100);
+
   const size = (radius + strokeWidth / 2) * 2;
   const center = size / 2;
 
-  const startAngle = 0; // top of the ring
+  const startAngle = 0;
   const arrowPosition = polarToCartesian(center, center, radius, startAngle);
+
+  const hasOverflow = percentage > 100;
+  const overflow = hasOverflow ? (percentage - 100) % 100 : 0;
+  const overflowDashOffset = circumference * (1 - overflow / 100);
+  const lapCount = Math.floor(percentage / 100);
 
   return (
     <View className="items-center justify-center">
       <Svg width={size} height={size}>
-        {/* Background arc */}
+        {/* Background Circle */}
         <Circle
           cx={center}
           cy={center}
@@ -54,7 +63,7 @@ const ActivityRing = ({
           fill="none"
         />
 
-        {/* Foreground arc */}
+        {/* Main Progress Ring */}
         <Circle
           cx={center}
           cy={center}
@@ -69,17 +78,29 @@ const ActivityRing = ({
           fill="none"
         />
 
-        {percentage !== 100 && (
-          <Path
-            d="m2.828 15.555 7.777-7.779L2.828 0 0 2.828l4.949 4.948L0 12.727l2.828 2.828z"
-            fill={"#000"}
-            scale={0.8}
-            transform={`
-            translate(${arrowPosition.x + 13}, ${arrowPosition.y - 6})
-            rotate(0, 0, 0)
-          `}
+        {/* Overflow Ring (if >100%) */}
+        {hasOverflow && (
+          <Circle
+            cx={center}
+            cy={center}
+            r={radius}
+            stroke={overflowColor}
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={overflowDashOffset}
+            rotation="-90"
+            origin={`${center}, ${center}`}
+            fill="none"
           />
         )}
+
+        <Path
+          d="m2.828 15.555 7.777-7.779L2.828 0 0 2.828l4.949 4.948L0 12.727l2.828 2.828z"
+          fill={"#000"}
+          scale={0.8}
+          transform={`translate(${arrowPosition.x + 13}, ${arrowPosition.y - 6}) rotate(0, 0, 0)`}
+        />
       </Svg>
     </View>
   );
