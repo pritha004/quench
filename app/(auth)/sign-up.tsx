@@ -17,7 +17,7 @@ const SignUp = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { setUser } = useAuth();
+  const { setUser, getUser } = useAuth();
 
   const submit = async () => {
     if (!form.username || !form.email || !form.password) {
@@ -30,6 +30,7 @@ const SignUp = () => {
       const currentUser: any = await getCurrentUser();
 
       setUser(currentUser);
+      await getUser();
       router.replace("/home");
     } catch (error: any) {
       Alert.alert("Error", error?.message);

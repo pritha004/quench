@@ -20,6 +20,7 @@ type AuthContextType = {
       | null
       | ((prev: UserPreferences | null) => UserPreferences | null)
   ) => void;
+  getUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,9 +32,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     getUser();
-  }, [user, setUser]);
+  }, []);
 
   const getUser = async () => {
+    setIsLoadingUser(true);
     try {
       const session: any = await getCurrentUser();
       setUser(session);
@@ -45,7 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, isLoadingUser }}>
+    <AuthContext.Provider value={{ user, setUser, isLoadingUser, getUser }}>
       {children}
     </AuthContext.Provider>
   );

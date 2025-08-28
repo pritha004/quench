@@ -16,7 +16,7 @@ const SignIn = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { setUser } = useAuth();
+  const { setUser, getUser } = useAuth();
 
   const submit = async () => {
     if (!form.email || !form.password) {
@@ -28,6 +28,7 @@ const SignIn = () => {
       await signin(form.email, form.password);
       const result: any = await getCurrentUser();
       setUser(result);
+      await getUser();
 
       router.replace("/home");
     } catch (error: any) {

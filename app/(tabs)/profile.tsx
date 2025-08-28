@@ -23,7 +23,7 @@ type HealthDetailsFormData = {
 };
 
 const Profile = () => {
-  const { user, setUser } = useAuth();
+  const { user, setUser, getUser } = useAuth();
   const navigation = useNavigation();
   const [drawerVisible, setDrawerVisible] = useState<{
     id: MenuType | null;
@@ -37,6 +37,7 @@ const Profile = () => {
     try {
       const result: any = await logout();
       setUser(null);
+      await getUser();
       router.replace("/");
     } catch (error: any) {
       Alert.alert("Error", error?.message);
@@ -64,6 +65,7 @@ const Profile = () => {
         if (!prev) return null;
         return { ...prev, ...userData };
       });
+      await getUser();
     } catch (error) {
       console.error("Profile completion error:", error);
     }

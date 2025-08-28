@@ -5,7 +5,7 @@ import Popup from "@/components/Popup";
 import { home } from "@/constants";
 import { useAuth } from "@/context/auth-context";
 import useFetch from "@/hooks/use-fetch";
-import { getUserHydration, logHydration } from "@/lib/appwrite";
+import { getUserHydrationForToday, logHydration } from "@/lib/appwrite";
 import { Plus } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
@@ -18,8 +18,9 @@ const Home = () => {
   const [openCustomAdd, setOpenCustomAdd] = useState(false);
   const [customAddValue, setCustomAddValue] = useState<string | null>();
 
-  const { fn: getUserHydrationFn, data: userHydrationLogs } =
-    useFetch(getUserHydration);
+  const { fn: getUserHydrationFn, data: userHydrationLogs } = useFetch(
+    getUserHydrationForToday
+  );
 
   const { fn: logHydrationFn } = useFetch(logHydration);
 
@@ -30,7 +31,7 @@ const Home = () => {
         userHydrationLogs?.reduce((sum, obj) => sum + obj.amt_intake_ml, 0) || 0
       );
     }
-  }, [user]);
+  }, [user?.userId]);
 
   useEffect(() => {
     setTotalIntake(

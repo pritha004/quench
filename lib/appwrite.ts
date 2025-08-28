@@ -134,7 +134,7 @@ export const logHydration = async (data: any) => {
   }
 };
 
-export const getUserHydration = async (userId: string) => {
+export const getUserHydrationForToday = async (userId: string) => {
   try {
     const today = new Date();
     const startOfToday = new Date(today.setHours(0, 0, 0, 0)).toISOString();
@@ -193,6 +193,56 @@ export const getUserHydration = async (userId: string) => {
     return strippedLogs;
   } catch (error) {
     console.log("Fetch Hydration logs error", error);
+    return [];
+  }
+};
+
+export const getUserHydrationAll = async (userId: string) => {
+  try {
+    const allLogs: any[] = [];
+    let lastId: string | null = null;
+    let hasMore = true;
+
+    while (hasMore) {
+      const queries = [Query.equal("userId", userId), Query.limit(100)];
+
+      if (lastId) {
+        queries.push(Query.cursorAfter(lastId));
+      }
+
+      const res = await db.listDocuments(
+        DATABASE_ID,
+        HYDRATIONLOGS_COLLECTION_ID,
+        queries
+      );
+
+      allLogs.push(...res.documents);
+
+      if (res.documents.length < 100) {
+        hasMore = false;
+      } else {
+        lastId = res.documents[res.documents.length - 1].$id;
+      }
+    }
+
+    const strippedLogs = allLogs.map((doc) => {
+      const {
+        $id,
+        $collectionId,
+        $databaseId,
+        $createdAt,
+        $updatedAt,
+        $permissions,
+        $sequence,
+        ...customFields
+      } = doc;
+
+      return customFields;
+    });
+
+    return strippedLogs;
+  } catch (error) {
+    console.log("Fetch All Hydration logs error", error);
     return [];
   }
 };
