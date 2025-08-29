@@ -134,7 +134,7 @@ const Home = () => {
             </Text>
             <View className="flex-row gap-8 items-center p-4">
               <View className="py-2">
-                {userHydrationLogs?.map((rec) => (
+                {userHydrationLogs?.reverse()?.map((rec) => (
                   <View
                     key={rec.logged_at}
                     className="w-full flex-row justify-between items-center p-2"
