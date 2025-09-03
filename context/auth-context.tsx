@@ -8,6 +8,7 @@ export type UserPreferences = Models.User<Models.Preferences> & {
   weight_kg: number | null;
   height_cm: number | null;
   daily_goal_ml: number | null;
+  total_intake_ml: number;
   userId: string;
 };
 

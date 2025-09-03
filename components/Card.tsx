@@ -1,10 +1,10 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { Text, View } from "react-native";
 import { twMerge } from "tailwind-merge";
 
 type Props = {
   classes: string;
-  title: string;
+  title: string | ReactNode;
   value: string | number;
 };
 

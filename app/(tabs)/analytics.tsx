@@ -4,8 +4,9 @@ import DailyAnalyticsChart from "@/components/DailyAnalyticsChart";
 import { useAuth } from "@/context/auth-context";
 import useFetch from "@/hooks/use-fetch";
 import { getUserHydrationAll } from "@/lib/appwrite";
+import { Flame } from "lucide-react-native";
 import { useEffect } from "react";
-import { ScrollView, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 function calculateCardStats(
@@ -76,7 +77,7 @@ const Analytics = () => {
     if (user?.userId) {
       getUserHydrationFn(user.userId);
     }
-  }, [user?.userId]);
+  }, [user?.total_intake_ml]);
 
   return (
     <SafeAreaView className="bg-bg flex-1 ">
@@ -99,7 +100,12 @@ const Analytics = () => {
 
           <Card
             classes="w-[120] h-[120] m-2 p-2"
-            title="Current Streak"
+            title={
+              <>
+                <Text>Current Streak</Text>
+                <Flame fill={"#000"} />
+              </>
+            }
             value={`${calculateCardStats(
               userHydrationLogs?.map((log) => ({
                 intake: log.amt_intake_ml,

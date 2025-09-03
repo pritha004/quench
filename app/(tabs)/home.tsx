@@ -3,16 +3,20 @@ import CustomButton from "@/components/Button";
 import FormField from "@/components/FormField";
 import Popup from "@/components/Popup";
 import { home } from "@/constants";
-import { useAuth } from "@/context/auth-context";
+import { UserPreferences, useAuth } from "@/context/auth-context";
 import useFetch from "@/hooks/use-fetch";
-import { getUserHydrationForToday, logHydration } from "@/lib/appwrite";
+import {
+  getUserHydrationForToday,
+  logHydration,
+  updateUserDetails,
+} from "@/lib/appwrite";
 import { Plus } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Home = () => {
-  const { user } = useAuth();
+  const { user, setUser, getUser } = useAuth();
 
   const [totalIntake, setTotalIntake] = useState(0);
   const [openCustomAdd, setOpenCustomAdd] = useState(false);
@@ -23,6 +27,8 @@ const Home = () => {
   );
 
   const { fn: logHydrationFn } = useFetch(logHydration);
+
+  const { fn: updateUserFn, data: userData } = useFetch(updateUserDetails);
 
   useEffect(() => {
     if (user?.userId) {
@@ -42,6 +48,16 @@ const Home = () => {
   const onSubmitAddHydration = async (values: any) => {
     try {
       await logHydrationFn(values);
+      await updateUserFn(user, {
+        ...user,
+        total_intake_ml: user?.total_intake_ml + values?.amtIntake,
+      });
+      setUser((prev: UserPreferences | null): UserPreferences | null => {
+        if (!prev) return null;
+        return { ...prev, ...userData };
+      });
+      await getUser();
+
       if (user?.userId) {
         await getUserHydrationFn(user.userId);
       }
