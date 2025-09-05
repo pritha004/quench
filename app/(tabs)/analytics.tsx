@@ -139,7 +139,7 @@ const Analytics = () => {
             maxVal={1}
           />
         </View>
-        <View className="mx-2 my-8">
+        <View className="mx-2 mt-4 mb-14">
           <AnalyticsCharts
             data={
               userHydrationLogs?.map((log) => ({
