@@ -6,10 +6,14 @@ import { profile } from "@/constants";
 import { UserPreferences, useAuth } from "@/context/auth-context";
 import useFetch from "@/hooks/use-fetch";
 import { logout, updateUserDetails } from "@/lib/appwrite";
+import {
+  cancelAllReminders,
+  registerForPushNotificationsAsync,
+} from "@/utils/notification";
 import { router, useNavigation } from "expo-router";
-import { ChevronRight, MinusIcon, PlusIcon } from "lucide-react-native";
-import React, { useState } from "react";
-import { Alert, Text, View } from "react-native";
+import { ChevronRight, MinusIcon, Plus, PlusIcon } from "lucide-react-native";
+import React, { useEffect, useState } from "react";
+import { Alert, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type MenuType = (typeof profile.menus)[number]["id"];
@@ -20,6 +24,7 @@ type HealthDetailsFormData = {
   weight_kg: number | null;
   height_cm: number | null;
   daily_goal_ml: number;
+  reminderEnabled: boolean;
 };
 
 const Profile = () => {
@@ -53,6 +58,7 @@ const Profile = () => {
       weight_kg: user?.weight_kg || null,
       height_cm: user?.height_cm || null,
       daily_goal_ml: user?.daily_goal_ml || 2500,
+      reminderEnabled: user?.reminderEnabled || false,
     });
 
   const onSubmitHealthDetails = async (values: any) => {
@@ -70,6 +76,24 @@ const Profile = () => {
       console.error("Profile completion error:", error);
     }
   };
+
+  const toggleSwitch = async () => {
+    setHealthDetailsFormData((prev) => ({
+      ...prev,
+      reminderEnabled: !healthDetailsFormData.reminderEnabled,
+    }));
+    await onSubmitHealthDetails(healthDetailsFormData);
+  };
+
+  useEffect(() => {
+    registerForPushNotificationsAsync();
+  }, []);
+
+  useEffect(() => {
+    if (!user?.reminderEnabled) {
+      cancelAllReminders();
+    }
+  }, [user?.reminderEnabled]);
 
   return (
     <SafeAreaView className="bg-bg flex-1 p-4">
@@ -213,7 +237,7 @@ const Profile = () => {
                 />
               </View>
             </>
-          ) : (
+          ) : drawerVisible.id === "hydration_goal" ? (
             <>
               <View>
                 <Text className="my-4 text-textprimary text-3xl font-bold text-center">
@@ -281,6 +305,69 @@ const Profile = () => {
                 />
               </View>
             </>
+          ) : drawerVisible.id === "reminders" ? (
+            <View className="h-full flex-col justify-between">
+              <View>
+                <Text className="my-4 text-textprimary text-3xl font-bold text-center">
+                  Reminders
+                </Text>
+                <Text className="my-2 text-textsecondary text-lg text-center">
+                  Stay on Track with Gentle Nudges
+                </Text>
+                <View className="my-4">
+                  <View className="bg-surface w-full rounded-xl min-h-[62px] justify-center items-center mb-4">
+                    <View className="flex-row w-full justify-between items-center px-4">
+                      <Text className={`text-textprimary text-xl font-bold`}>
+                        Reminder
+                      </Text>
+                      <Switch
+                        onValueChange={() => {
+                          toggleSwitch();
+                        }}
+                        value={user?.reminderEnabled}
+                        trackColor={{ false: "", true: "#82D4C9" }}
+                      />
+                    </View>
+                  </View>
+                  {user?.reminders && user?.reminders?.length > 0 && (
+                    <>
+                      <View className="bg-surface w-full rounded-xl min-h-[82px] justify-center items-center">
+                        <View className="flex-row w-full justify-between items-center px-4">
+                          <Text
+                            className={`text-textprimary text-xl font-bold`}
+                          >
+                            Reminder
+                          </Text>
+                          <CustomButton
+                            handlePress={() => {}}
+                            child={
+                              <View className="bg-accent rounded-full p-3">
+                                <Plus color={"black"} />
+                              </View>
+                            }
+                          />
+                        </View>
+                      </View>
+                    </>
+                  )}
+                </View>
+              </View>
+              {user?.reminderEnabled && (
+                <View className="my-4">
+                  <CustomButton
+                    child={
+                      <View className="bg-accent rounded-full p-4">
+                        <Plus color={"black"} />
+                      </View>
+                    }
+                    handlePress={() => {}}
+                    containerStyles="w-full"
+                  />
+                </View>
+              )}
+            </View>
+          ) : (
+            <></>
           )
         }
       />

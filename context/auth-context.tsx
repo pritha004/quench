@@ -10,6 +10,8 @@ export type UserPreferences = Models.User<Models.Preferences> & {
   daily_goal_ml: number | null;
   total_intake_ml: number;
   userId: string;
+  reminderEnabled: boolean;
+  reminders: string[];
 };
 
 type AuthContextType = {
