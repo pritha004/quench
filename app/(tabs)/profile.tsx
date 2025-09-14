@@ -90,7 +90,10 @@ const Profile = () => {
       ...prev,
       reminderEnabled: !healthDetailsFormData.reminderEnabled,
     }));
-    await onSubmitHealthDetails(healthDetailsFormData);
+    await onSubmitHealthDetails({
+      ...healthDetailsFormData,
+      reminderEnabled: !healthDetailsFormData.reminderEnabled,
+    });
   };
 
   useEffect(() => {
@@ -115,7 +118,6 @@ const Profile = () => {
         await cancelAllReminders();
         await saveReminders({ enabled: false, ids: [] });
       } else {
-        await cancelAllReminders();
         const ids = await scheduleDailyIntervalReminderNotifications(user);
         await saveReminders({
           enabled: true,
@@ -123,7 +125,12 @@ const Profile = () => {
         });
       }
     })();
-  }, [user?.reminderEnabled]);
+  }, [
+    user?.reminderEnabled,
+    user?.wakeTime,
+    user?.sleepTime,
+    user?.reminderInterval,
+  ]);
 
   return (
     <SafeAreaView className="bg-bg flex-1 p-4">
@@ -354,12 +361,12 @@ const Profile = () => {
                         onValueChange={() => {
                           toggleSwitch();
                         }}
-                        value={user?.reminderEnabled}
+                        value={healthDetailsFormData?.reminderEnabled}
                         trackColor={{ false: "", true: "#82D4C9" }}
                       />
                     </View>
                   </View>
-                  {user?.reminderEnabled && (
+                  {healthDetailsFormData?.reminderEnabled && (
                     <>
                       <TimePicker
                         title="Wake Up"
