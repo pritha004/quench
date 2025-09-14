@@ -11,7 +11,9 @@ export type UserPreferences = Models.User<Models.Preferences> & {
   total_intake_ml: number;
   userId: string;
   reminderEnabled: boolean;
-  reminders: string[];
+  reminderInterval: number;
+  wakeTime: string;
+  sleepTime: string;
 };
 
 type AuthContextType = {

@@ -1,35 +1,49 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useState } from "react";
-import { Modal, Platform, Text, TouchableOpacity, View } from "react-native";
+import { Modal, Text, TouchableOpacity, View } from "react-native";
 import CustomButton from "./Button";
 
-type DatePickerProps = {
+type TimePickerProps = {
   title: string;
-  value: Date | null;
-  onChange: (date: Date | null) => void;
+  value: string | null;
+  onChange: (time: string | null) => void;
 };
 
-const Reminder = ({ title, value, onChange }: DatePickerProps) => {
+const TimePicker = ({ title, value, onChange }: TimePickerProps) => {
   const [showPicker, setShowPicker] = useState(false);
-  const [tempDate, setTempDate] = useState<Date | null>(value);
+  const [tempTime, setTempTime] = useState<Date>(
+    value
+      ? new Date(
+          0,
+          0,
+          0,
+          parseInt(value.split(":")[0]),
+          parseInt(value.split(":")[1])
+        )
+      : new Date()
+  );
 
   const handleTempChange = (_event: any, selectedDate?: Date) => {
     if (selectedDate) {
-      setTempDate(selectedDate);
+      setTempTime(selectedDate);
     }
   };
 
   const confirmDate = () => {
-    onChange(tempDate);
+    onChange(
+      `${tempTime?.getHours().toString().padStart(2, "0")}:${tempTime
+        ?.getMinutes()
+        .toString()
+        .padStart(2, "0")}`
+    );
     setShowPicker(false);
   };
 
   const cancelPicker = () => {
-    setTempDate(value);
     setShowPicker(false);
   };
 
-  const formattedDate = value ? value.toLocaleDateString() : "Select";
+  const formattedDate = value ? value : "Select";
 
   return (
     <View className="mb-4">
@@ -49,7 +63,7 @@ const Reminder = ({ title, value, onChange }: DatePickerProps) => {
         }
       />
 
-      {Platform.OS === "ios" && showPicker && (
+      {showPicker && (
         <Modal
           transparent
           animationType="slide"
@@ -68,11 +82,10 @@ const Reminder = ({ title, value, onChange }: DatePickerProps) => {
               </View>
               <View className="items-center">
                 <DateTimePicker
-                  value={tempDate || new Date()}
+                  value={tempTime}
                   mode="time"
                   display="spinner"
                   onChange={handleTempChange}
-                  maximumDate={new Date()}
                   themeVariant="dark"
                   style={{ height: 200 }}
                 />
@@ -81,24 +94,8 @@ const Reminder = ({ title, value, onChange }: DatePickerProps) => {
           </View>
         </Modal>
       )}
-
-      {Platform.OS === "android" && showPicker && (
-        <DateTimePicker
-          value={value || new Date()}
-          mode="time"
-          display="default"
-          onChange={(_event, selectedDate) => {
-            setShowPicker(false);
-            if (selectedDate) {
-              onChange(selectedDate);
-            }
-          }}
-          maximumDate={new Date()}
-          themeVariant="dark"
-        />
-      )}
     </View>
   );
 };
 
-export default Reminder;
+export default TimePicker;

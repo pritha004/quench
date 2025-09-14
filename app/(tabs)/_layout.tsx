@@ -1,6 +1,8 @@
+import { registerForPushNotificationsAsync } from "@/utils/notification";
 import { Tabs } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ChartNoAxesCombined, CircleUser, House } from "lucide-react-native";
+import { useEffect } from "react";
 import { View } from "react-native";
 
 const TabIcon = ({ focused, icon, title, color }: any) => {
@@ -15,6 +17,10 @@ const TabIcon = ({ focused, icon, title, color }: any) => {
 };
 
 export default function TabLayout() {
+  useEffect(() => {
+    registerForPushNotificationsAsync();
+  }, []);
+
   return (
     <>
       <Tabs

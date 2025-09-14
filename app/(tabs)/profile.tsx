@@ -2,16 +2,18 @@ import CustomButton from "@/components/Button";
 import DatePicker from "@/components/DatePicker";
 import Drawer from "@/components/Drawer";
 import Dropdown from "@/components/Dropdown";
+import TimePicker from "@/components/TimePicker";
 import { profile } from "@/constants";
 import { UserPreferences, useAuth } from "@/context/auth-context";
 import useFetch from "@/hooks/use-fetch";
 import { logout, updateUserDetails } from "@/lib/appwrite";
 import {
   cancelAllReminders,
-  registerForPushNotificationsAsync,
+  scheduleDailyIntervalReminderNotifications,
 } from "@/utils/notification";
+import { loadReminders, saveReminders } from "@/utils/storage";
 import { router, useNavigation } from "expo-router";
-import { ChevronRight, MinusIcon, Plus, PlusIcon } from "lucide-react-native";
+import { ChevronRight, MinusIcon, PlusIcon } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
 import { Alert, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -25,6 +27,9 @@ type HealthDetailsFormData = {
   height_cm: number | null;
   daily_goal_ml: number;
   reminderEnabled: boolean;
+  reminderInterval: number;
+  wakeTime: string | null;
+  sleepTime: string | null;
 };
 
 const Profile = () => {
@@ -59,6 +64,9 @@ const Profile = () => {
       height_cm: user?.height_cm || null,
       daily_goal_ml: user?.daily_goal_ml || 2500,
       reminderEnabled: user?.reminderEnabled || false,
+      reminderInterval: user?.reminderInterval || 0,
+      wakeTime: user?.wakeTime || null,
+      sleepTime: user?.sleepTime || null,
     });
 
   const onSubmitHealthDetails = async (values: any) => {
@@ -86,13 +94,35 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    registerForPushNotificationsAsync();
+    (async () => {
+      const stored = await loadReminders();
+      if (stored?.enabled && user) {
+        const ids = await scheduleDailyIntervalReminderNotifications(user);
+        await saveReminders({
+          enabled: true,
+          ids: ids && ids.length > 0 ? ids : [],
+        });
+      }
+    })();
   }, []);
 
   useEffect(() => {
     if (!user?.reminderEnabled) {
       cancelAllReminders();
     }
+    (async () => {
+      if (!user?.reminderEnabled) {
+        await cancelAllReminders();
+        await saveReminders({ enabled: false, ids: [] });
+      } else {
+        await cancelAllReminders();
+        const ids = await scheduleDailyIntervalReminderNotifications(user);
+        await saveReminders({
+          enabled: true,
+          ids: ids && ids.length > 0 ? ids : [],
+        });
+      }
+    })();
   }, [user?.reminderEnabled]);
 
   return (
@@ -329,42 +359,58 @@ const Profile = () => {
                       />
                     </View>
                   </View>
-                  {user?.reminders && user?.reminders?.length > 0 && (
+                  {user?.reminderEnabled && (
                     <>
-                      <View className="bg-surface w-full rounded-xl min-h-[82px] justify-center items-center">
-                        <View className="flex-row w-full justify-between items-center px-4">
-                          <Text
-                            className={`text-textprimary text-xl font-bold`}
-                          >
-                            Reminder
-                          </Text>
-                          <CustomButton
-                            handlePress={() => {}}
-                            child={
-                              <View className="bg-accent rounded-full p-3">
-                                <Plus color={"black"} />
-                              </View>
-                            }
-                          />
-                        </View>
+                      <TimePicker
+                        title="Wake Up"
+                        value={healthDetailsFormData.wakeTime}
+                        onChange={(time) =>
+                          setHealthDetailsFormData((prev) => ({
+                            ...prev,
+                            wakeTime: time,
+                          }))
+                        }
+                      />
+                      <TimePicker
+                        title="Sleep"
+                        value={healthDetailsFormData.sleepTime}
+                        onChange={(time) =>
+                          setHealthDetailsFormData((prev) => ({
+                            ...prev,
+                            sleepTime: time,
+                          }))
+                        }
+                      />
+                      <Dropdown
+                        value={healthDetailsFormData.reminderInterval}
+                        options={profile.intervals}
+                        title="Set Interval"
+                        onChange={(value) =>
+                          setHealthDetailsFormData((prev) => ({
+                            ...prev,
+                            reminderInterval: value,
+                          }))
+                        }
+                      />
+                      <View>
+                        <CustomButton
+                          handlePress={() => {
+                            onSubmitHealthDetails(healthDetailsFormData);
+                            setDrawerVisible({
+                              id: null,
+                              visible: false,
+                            });
+                            setTimeout(() => {
+                              navigation.navigate("profile" as never);
+                            }, 300);
+                          }}
+                          title="Done"
+                        />
                       </View>
                     </>
                   )}
                 </View>
               </View>
-              {user?.reminderEnabled && (
-                <View className="my-4">
-                  <CustomButton
-                    child={
-                      <View className="bg-accent rounded-full p-4">
-                        <Plus color={"black"} />
-                      </View>
-                    }
-                    handlePress={() => {}}
-                    containerStyles="w-full"
-                  />
-                </View>
-              )}
             </View>
           ) : (
             <></>

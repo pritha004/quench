@@ -11,6 +11,12 @@ Notifications.setNotificationHandler({
   }),
 });
 
+// Parse "HH:mm" → { hour, minute }
+const parseTime = (time: string) => {
+  const [hour, minute] = time.split(":").map(Number);
+  return { hour, minute };
+};
+
 export async function registerForPushNotificationsAsync() {
   let token: string | null = null;
 
@@ -43,42 +49,53 @@ export async function registerForPushNotificationsAsync() {
   }
 }
 
-export async function scheduleReminderNotifications(user: UserPreferences) {
+export async function scheduleDailyIntervalReminderNotifications(
+  user: UserPreferences
+) {
   if (!user.reminderEnabled) return;
 
+  const wake = parseTime(user.wakeTime);
+  const sleepTime = parseTime(user.sleepTime);
+
+  let currentHour = wake.hour;
+  let currentMinute = wake.minute;
+
+  const ids: string[] = [];
+
   try {
-    for (const time of user.reminders) {
-      const [hours, minutes] = time.split(":").map(Number);
-      const today = new Date();
-      today.setHours(hours, minutes, 0, 0);
-
-      if (today < new Date()) {
-        today.setDate(today.getDate() + 1);
-      }
-
+    while (
+      currentHour < sleepTime.hour ||
+      (currentHour === sleepTime.hour && currentMinute <= sleepTime.minute)
+    ) {
       const id = await Notifications.scheduleNotificationAsync({
         content: {
-          title: "",
-          body: "",
-          sound: "default",
-          priority: Notifications.AndroidNotificationPriority.HIGH,
+          title: "💧 Time to Hydrate!",
+          body: "Take a sip of water 🥤",
+          sound: true,
         },
         trigger: {
-          hour: hours,
-          minute: minutes,
+          hour: currentHour,
+          minute: currentMinute,
           repeats: true,
         } as Notifications.CalendarTriggerInput,
       });
 
-      return id;
+      ids.push(id);
+
+      currentMinute += user.reminderInterval;
+      while (currentMinute >= 60) {
+        currentMinute -= 60;
+        currentHour += 1;
+      }
     }
+    return ids;
   } catch (error) {
     console.log("Error scheduling reminder:", error);
     return undefined;
   }
 }
 
-export async function cancelReminder(id: string) {
+export async function cancelReminderById(id: string) {
   await Notifications.cancelScheduledNotificationAsync(id);
 }
 
