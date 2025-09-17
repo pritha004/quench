@@ -10,6 +10,10 @@ import {
   logHydration,
   updateUserDetails,
 } from "@/lib/appwrite";
+import {
+  cancelAllReminders,
+  scheduleHydrationReminders,
+} from "@/utils/notification";
 import { Plus } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
@@ -65,6 +69,25 @@ const Home = () => {
       console.error("Adding hydration log error:", error);
     }
   };
+
+  useEffect(() => {
+    (async () => {
+      await cancelAllReminders();
+      if (
+        user?.reminderEnabled &&
+        user?.wakeTime &&
+        user?.sleepTime &&
+        user?.reminderInterval
+      ) {
+        await scheduleHydrationReminders(user);
+      }
+    })();
+  }, [
+    user?.reminderEnabled,
+    user?.wakeTime,
+    user?.sleepTime,
+    user?.reminderInterval,
+  ]);
 
   return (
     <SafeAreaView className="bg-bg flex-1 p-4">

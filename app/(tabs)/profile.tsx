@@ -7,14 +7,9 @@ import { profile } from "@/constants";
 import { UserPreferences, useAuth } from "@/context/auth-context";
 import useFetch from "@/hooks/use-fetch";
 import { logout, updateUserDetails } from "@/lib/appwrite";
-import {
-  cancelAllReminders,
-  scheduleDailyIntervalReminderNotifications,
-} from "@/utils/notification";
-import { loadReminders, saveReminders } from "@/utils/storage";
 import { router, useNavigation } from "expo-router";
 import { ChevronRight, MinusIcon, PlusIcon } from "lucide-react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Alert, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -95,42 +90,6 @@ const Profile = () => {
       reminderEnabled: !healthDetailsFormData.reminderEnabled,
     });
   };
-
-  useEffect(() => {
-    (async () => {
-      const stored = await loadReminders();
-      if (stored?.enabled && user) {
-        const ids = await scheduleDailyIntervalReminderNotifications(user);
-        await saveReminders({
-          enabled: true,
-          ids: ids && ids.length > 0 ? ids : [],
-        });
-      }
-    })();
-  }, []);
-
-  useEffect(() => {
-    if (!user?.reminderEnabled) {
-      cancelAllReminders();
-    }
-    (async () => {
-      if (!user?.reminderEnabled) {
-        await cancelAllReminders();
-        await saveReminders({ enabled: false, ids: [] });
-      } else {
-        const ids = await scheduleDailyIntervalReminderNotifications(user);
-        await saveReminders({
-          enabled: true,
-          ids: ids && ids.length > 0 ? ids : [],
-        });
-      }
-    })();
-  }, [
-    user?.reminderEnabled,
-    user?.wakeTime,
-    user?.sleepTime,
-    user?.reminderInterval,
-  ]);
 
   return (
     <SafeAreaView className="bg-bg flex-1 p-4">
